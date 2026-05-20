@@ -5,233 +5,377 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>POCAPAY HUB</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --purple: #8B5CF6;
-      --pink: #F472B6;
-      --yellow: #FEF08A;
-      --green: #4ADE80;
-      --black: #000;
-      --white: #fff;
+      --bg: #050505;
+      --fg: #f0f0f0;
+      --muted: #666;
+      --card-1: #ff006e;
+      --card-2: #00f5d4;
+      --card-3: #fee440;
+      --surface: #0a0a0a;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Space Grotesk', sans-serif;
-      background: var(--purple);
+      background: var(--bg);
+      color: var(--fg);
       min-height: 100vh;
-      padding: 2rem 1rem;
-      color: var(--black);
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── Grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.04;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 100;
+    }
+
+    /* ── Floating orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+    .orb-1 { width: 600px; height: 600px; background: var(--card-1); top: -10%; left: -10%; animation-delay: 0s; }
+    .orb-2 { width: 500px; height: 500px; background: var(--card-2); bottom: -10%; right: -10%; animation-delay: -7s; }
+    .orb-3 { width: 400px; height: 400px; background: var(--card-3); top: 40%; left: 40%; animation-delay: -14s; opacity: 0.08; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 30px) scale(0.9); }
     }
 
     .container {
       max-width: 1200px;
       margin: 0 auto;
+      padding: 4rem 1.5rem;
+      position: relative;
+      z-index: 1;
     }
 
     /* ── HEADER ── */
     .header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .header-box {
-      display: inline-block;
-      background: var(--white);
-      border: 4px solid var(--black);
-      padding: 1.5rem 2.5rem;
-      box-shadow: 8px 8px 0 0 var(--black);
-      transform: rotate(-1.5deg);
-      transition: transform 0.3s ease;
-    }
-
-    .header-box:hover {
-      transform: rotate(0deg);
-    }
-
-    .header h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: -0.04em;
-      line-height: 1;
-    }
-
-    .header h1 span {
-      color: var(--pink);
-    }
-
-    .header-badge {
-      display: inline-block;
-      margin-top: 1.5rem;
-      background: var(--yellow);
-      border: 4px solid var(--black);
-      padding: 0.5rem 1.5rem;
-      font-weight: 700;
-      font-size: 0.9rem;
-      box-shadow: 4px 4px 0 0 var(--black);
-    }
-
-    /* ── CARDS GRID ── */
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-
-    .card {
-      background: var(--white);
-      border: 4px solid var(--black);
-      padding: 2rem;
-      box-shadow: 8px 8px 0 0 var(--black);
-      transition: all 0.2s ease;
-      text-decoration: none;
-      color: var(--black);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      margin-bottom: 6rem;
       position: relative;
     }
 
+    .header-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-label::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: var(--muted);
+    }
+
+    .header h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(4rem, 12vw, 10rem);
+      font-weight: 400;
+      line-height: 0.85;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      color: var(--card-1);
+      display: block;
+    }
+
+    .header-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    /* ── MARQUEE ── */
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 0.75rem 0;
+      margin-bottom: 4rem;
+    }
+
+    .marquee-track {
+      display: inline-block;
+      animation: scroll 30s linear infinite;
+    }
+
+    .marquee span {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      padding: 0 2rem;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── CARDS ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid #1a1a1a;
+      padding: 2.5rem;
+      text-decoration: none;
+      color: var(--fg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 0;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-1::before { background: radial-gradient(circle at 80% 20%, rgba(255,0,110,0.08), transparent 60%); }
+    .card-2::before { background: radial-gradient(circle at 80% 20%, rgba(0,245,212,0.08), transparent 60%); }
+    .card-3::before { background: radial-gradient(circle at 80% 20%, rgba(254,228,64,0.08), transparent 60%); }
+
     .card:hover {
-      transform: translate(-4px, -4px);
-      box-shadow: 12px 12px 0 0 var(--black);
+      border-color: var(--accent);
+      transform: translateY(-8px);
     }
 
-    .card:active {
-      transform: translate(4px, 4px);
-      box-shadow: 4px 4px 0 0 var(--black);
-    }
-
-    .card-icon {
-      font-size: 3rem;
+    .card-number {
+      font-family: 'Instrument Serif', serif;
+      font-size: 5rem;
+      font-weight: 400;
       line-height: 1;
+      opacity: 0.08;
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover .card-number { opacity: 0.15; }
+
+    .card-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
     }
 
     .card h2 {
-      font-size: 1.75rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: -0.02em;
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.5rem;
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card h2 em {
+      font-style: italic;
+      display: block;
     }
 
     .card p {
-      font-size: 1rem;
-      line-height: 1.5;
-      color: #444;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 2rem;
       flex: 1;
+      position: relative;
+      z-index: 2;
     }
 
-    .card-url {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--purple);
-      word-break: break-all;
+    .card-meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
     }
 
     .card-cta {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      background: var(--black);
-      color: var(--white);
-      padding: 0.75rem 1.25rem;
+      gap: 0.75rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
       font-weight: 700;
-      font-size: 0.9rem;
       text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border: 1px solid #1a1a1a;
+      padding: 0.875rem 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
       align-self: flex-start;
-      margin-top: auto;
+    }
+
+    .card:hover .card-cta {
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.03);
     }
 
     .card-cta::after {
-      content: "→";
-      font-size: 1.2rem;
-      transition: transform 0.2s ease;
+      content: '↗';
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
     }
 
     .card:hover .card-cta::after {
-      transform: translateX(4px);
+      transform: translate(2px, -2px);
     }
 
-    /* Color accents per card */
-    .card:nth-child(1) { border-top: 8px solid var(--pink); }
-    .card:nth-child(2) { border-top: 8px solid var(--green); }
-    .card:nth-child(3) { border-top: 8px solid var(--yellow); }
+    .card-1 { --accent: var(--card-1); }
+    .card-2 { --accent: var(--card-2); }
+    .card-3 { --accent: var(--card-3); }
 
     /* ── FOOTER ── */
     .footer {
-      text-align: center;
-      margin-top: 4rem;
-      padding: 1.5rem;
-      background: var(--white);
-      border: 4px solid var(--black);
-      box-shadow: 6px 6px 0 0 var(--black);
-      font-weight: 700;
-      font-size: 0.9rem;
+      margin-top: 6rem;
+      padding-top: 3rem;
+      border-top: 1px solid #1a1a1a;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 2rem;
     }
 
-    .footer a {
-      color: var(--purple);
-      text-decoration: none;
+    .footer-left {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      line-height: 1.8;
+    }
+
+    .footer-right {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.5rem;
+      font-style: italic;
+      color: #333;
     }
 
     @media (max-width: 640px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
+      .footer { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
   <div class="container">
-    <!-- HEADER -->
     <header class="header">
-      <div class="header-box">
-        <h1>POCAPAY <span>HUB</span></h1>
-      </div>
-      <div class="header-badge">K-Pop Ecosystem // 3 Tools</div>
+      <div class="header-label">Ecosistema K-Pop</div>
+      <h1>POCAPAY<br><em>Hub</em></h1>
+      <p class="header-sub">Tres herramientas construidas para la comunidad K-Pop hispanohablante. Compra, descubre y traduce.</p>
     </header>
 
-    <!-- CARDS -->
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>K-Pop Store</span><span>—</span><span>Lyrics Translator</span><span>—</span><span>Image Extractor</span><span>—</span><span>K-Pop Store</span><span>—</span><span>Lyrics Translator</span><span>—</span><span>Image Extractor</span><span>—</span>
+        <span>K-Pop Store</span><span>—</span><span>Lyrics Translator</span><span>—</span><span>Image Extractor</span><span>—</span><span>K-Pop Store</span><span>—</span><span>Lyrics Translator</span><span>—</span><span>Image Extractor</span><span>—</span>
+      </div>
+    </div>
+
     <div class="cards">
-      <!-- POCAPAY GO -->
-      <a href="https://pocapay.com" class="card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon">🛒</div>
-        <h2>POCAPAY GO</h2>
-        <p>Tienda de K-Pop en México. Álbumes, photocards, merch oficial y más. Envíos a todo el país.</p>
-        <div class="card-url">pocapay.com</div>
-        <span class="card-cta">Ir a la tienda</span>
+      <a href="https://pocapay.com" class="card card-1" target="_blank" rel="noopener noreferrer">
+        <div class="card-number">01</div>
+        <div class="card-label">E-Commerce</div>
+        <h2>POCAPAY<em>GO</em></h2>
+        <p>Tienda de K-Pop en México. Álbumes, photocards, merch oficial. Envíos a todo el país.</p>
+        <div class="card-meta">pocapay.com // Next.js + Prisma</div>
+        <span class="card-cta">Visitar tienda</span>
       </a>
 
-      <!-- K-Lyric Neo -->
-      <a href="https://lyrics.pocapay.com" class="card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon">🎵</div>
-        <h2>K-Lyric Neo</h2>
-        <p>Busca letras de K-Pop por canción, romaniza automáticamente y traduce al inglés o español.</p>
-        <div class="card-url">lyrics.pocapay.com</div>
+      <a href="https://lyrics.pocapay.com" class="card card-2" target="_blank" rel="noopener noreferrer">
+        <div class="card-number">02</div>
+        <div class="card-label">Translation Tool</div>
+        <h2>K-Lyric<em>Neo</em></h2>
+        <p>Busca letras por canción, romaniza hangul y traduce a inglés o español. Sin copy-paste.</p>
+        <div class="card-meta">lyrics.pocapay.com // Genius API</div>
         <span class="card-cta">Buscar letras</span>
       </a>
 
-      <!-- Spotify Image Extractor -->
-      <a href="https://spotify.pocapay.com" class="card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon">🎨</div>
-        <h2>Spotify Image Extractor</h2>
-        <p>Extrae imágenes de banners y avatares de artistas de Spotify en alta resolución.</p>
-        <div class="card-url">spotify.pocapay.com</div>
+      <a href="https://spotify.pocapay.com" class="card card-3" target="_blank" rel="noopener noreferrer">
+        <div class="card-number">03</div>
+        <div class="card-label">Image Tool</div>
+        <h2>Spotify<em>Extractor</em></h2>
+        <p>Extrae banners y avatares de artistas de Spotify en alta resolución para tus proyectos.</p>
+        <div class="card-meta">spotify.pocapay.com // Puppeteer</div>
         <span class="card-cta">Extraer imágenes</span>
       </a>
     </div>
 
-    <!-- FOOTER -->
     <footer class="footer">
-      Powered by <a href="https://pocapay.com" target="_blank" rel="noopener noreferrer">POCAPAY GO</a> — Hecho con 💜 para la comunidad K-Pop
+      <div class="footer-left">
+        Made in México<br>
+        Powered by POCAPAY GO
+      </div>
+      <div class="footer-right">2026</div>
     </footer>
   </div>
 </body>
