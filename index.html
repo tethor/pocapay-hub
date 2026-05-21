@@ -65,6 +65,11 @@
       pointer-events: none;
       z-index: 0;
       animation: float 20s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    @media (max-width: 768px) {
+      .orb { display: none; }
     }
     .orb-1 { width: 600px; height: 600px; background: var(--card-1); top: -10%; left: -10%; animation-delay: 0s; }
     .orb-2 { width: 500px; height: 500px; background: var(--card-2); bottom: -10%; right: -10%; animation-delay: -7s; }
